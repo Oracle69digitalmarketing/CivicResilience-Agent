@@ -1,5 +1,0 @@
-./cast.go
-./ecdsa.go
-./ecdsa_noasm.go
-./hmacdrbg.go
-./ecdsa_test.go
