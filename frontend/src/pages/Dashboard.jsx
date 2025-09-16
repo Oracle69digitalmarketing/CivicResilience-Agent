@@ -1,51 +1,84 @@
-import React, { useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import i18n from "../i18n";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import MapView from "../components/MapView";
 
-const Dashboard = () => {
-  const { t } = useTranslation();
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+
+export default function Dashboard() {
+  const [incidents, setIncidents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("preferredLang");
-    if (savedLang) {
-      i18n.changeLanguage(savedLang);
-    }
+    fetchIncidents();
   }, []);
 
-  const handleLanguageChange = (e) => {
-    const lang = e.target.value;
-    i18n.changeLanguage(lang);
-    localStorage.setItem("preferredLang", lang);
-  };
+  async function fetchIncidents() {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API_BASE}/incidents`);
+      setIncidents(res.data.incidents);
+    } catch (e) {
+      console.error("Error fetching incidents:", e);
+    }
+    setLoading(false);
+  }
+
+  async function routeIncident(id) {
+    try {
+      await axios.post(`${API_BASE}/route`, { incident_id: id });
+      alert("Incident routed!");
+    } catch (e) {
+      console.error("Routing failed:", e);
+    }
+  }
+
+  async function resolveIncident(id) {
+    try {
+      await axios.post(`${API_BASE}/resolve`, { incident_id: id });
+      alert("Incident marked as resolved.");
+      fetchIncidents();
+    } catch (e) {
+      console.error("Resolution failed:", e);
+    }
+  }
 
   return (
     <div className="dashboard">
-      {/* 🌍 Language Selector */}
-      <div className="language-toggle">
-        <select onChange={handleLanguageChange} defaultValue={i18n.language}>
-          <option value="en">🇬🇧 English</option>
-          <option value="yo">🇳🇬 Yorùbá</option>
-          <option value="ha">🇳🇬 Hausa</option>
-          <option value="ig">🇳🇬 Igbo</option>
-          <option value="fr">🇫🇷 Français</option>
-          <option value="es">🇪🇸 Español</option>
-          <option value="ar">🇸🇦 العربية</option>
-          <option value="zh">🇨🇳 中文</option>
-          <option value="hi">🇮🇳 हिन्दी</option>
-          <option value="pt">🇵🇹 Português</option>
-        </select>
+      <h2>Responder Dashboard</h2>
+      {loading && <p>Loading incidents...</p>}
+      <div>
+        {incidents.map((i) => (
+          <div key={i.id} className="incident-card">
+            <strong>{i.category || "Unclassified"}</strong> — {i.report_text}
+            <br />
+            <small>
+              {i.location} • Severity: {i.severity} •{" "}
+              {i.resolved ? "✅ Resolved" : "⏳ Unresolved"}
+            </small>
+            <br />
+            {!i.resolved && (
+              <>
+                <button onClick={() => routeIncident(i.id)}>Route Alert</button>
+                <button onClick={() => resolveIncident(i.id)}>Mark Resolved</button>
+              </>
+            )}
+          </div>
+        ))}
       </div>
-
-      {/* 🧭 Dashboard Title */}
-      <h2>{t("dashboard_title")}</h2>
-
-      {/* 🧠 Analytics Section */}
-      <div className="analytics">
-        <h3>{t("analytics_title")}</h3>
-        {/* Add your charts and components here */}
-      </div>
+      <MapView
+        incidentData={{
+          type: "FeatureCollection",
+          features: incidents.map((i) => ({
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [i.longitude, i.latitude]
+            },
+            properties: i
+          }))
+        }}
+        preferences={{ categories: [], severity: "Low", radius: 100 }}
+      />
     </div>
   );
-};
-
-export default Dashboard;
+}
