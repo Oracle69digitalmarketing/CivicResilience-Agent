@@ -1,38 +1,77 @@
-# CivicResilience Agent - MVP
-This repo contains a full-stack, hackathon-ready MVP for the CivicResilience Agent.
+🚨 CivicResilience Agent – Hackathon MVP
 
-## Structure
-- backend/ : FastAPI app (api: /api/ingest, /api/analyze, /api/route, /api/feedback, /api/incidents)
-- frontend/: Minimal React + Vite demo UI
-- tests/: pytest integration test for backend
+An AI-powered full-stack agent for incident reporting, analysis, and routing. Built fast, demo-ready, and fully extensible.
 
-## Quickstart (Local)
-1. Backend:
-   ```bash
-   cd backend
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-2. Frontend (new terminal):
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
 
-Environment variables:
-- OPENAI_API_KEY (optional) - for embeddings & LLM
-- AUTHORITY_WEBHOOK (optional) - webhook to forward routed incidents
-- DB_PATH (optional) - sqlite path (default civicresilience.db)
+---
 
-## Tests
-```bash
+📂 Project Structure
+
+backend/   → FastAPI API (ingest, analyze, route, feedback, incidents)
+frontend/  → React + Vite demo UI
+tests/     → pytest integration tests
+
+
+---
+
+⚡ Quickstart (Local Dev)
+
+1. Backend
+
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+
+2. Frontend (new terminal)
+
+cd frontend
+npm install
+npm run dev
+
+
+---
+
+🔑 Environment Variables
+
+OPENAI_API_KEY (optional) → embeddings + LLM features
+
+AUTHORITY_WEBHOOK (optional) → forward routed incidents
+
+DB_PATH (optional) → SQLite path (default: civicresilience.db)
+
+
+
+---
+
+✅ Tests
+
 pip install pytest
 pytest tests/test_backend.py
-```
 
-## Notes
-- TiDB integration is left as an adapter (backend/app/tidb_adapter.py). Replace with real TiDB client calls for production.
-- This scaffold is optimized for rapid hackathon demo and easy extension.
+
+---
+
+🗄️ Database Notes
+
+Default: local SQLite (civicresilience.db)
+
+TiDB Integration: placeholder adapter at
+
+backend/app/tidb_adapter.py
+
+Swap in real TiDB client calls for production or cloud deployment.
+
+
+
+---
+
+🛠️ Built For
+
+⚡ Hackathon speed
+
+📦 Easy extension
+
+🌍 Real-world civic resilience use cases
+
